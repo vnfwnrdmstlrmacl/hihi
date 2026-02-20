@@ -99,3 +99,65 @@ resource "aws_dms_replication_task" "main" {
 
   tags = { Name = "${var.project_name}-migration-task" }
 }
+# 7. [역방향] 소스 엔드포인트 (AWS RDS가 이번엔 출발지)
+resource "aws_dms_endpoint" "reverse_source" {
+  endpoint_id   = "rds-source-rev"
+  endpoint_type = "source"
+  engine_name   = "postgres"
+  server_name   = var.rds_endpoint
+  port          = 5432
+  database_name = "appdb"
+  username      = "postgres"
+  password      = var.db_password
+  ssl_mode      = "none" # 필요시 'require'로 변경
+}
+
+# 8. [역방향] 타겟 엔드포인트 (온프레미스가 이번엔 목적지)
+resource "aws_dms_endpoint" "reverse_target" {
+  endpoint_id   = "onprem-target-rev"
+  endpoint_type = "target"
+  engine_name   = "postgres"
+  server_name   = var.onprem_db_tailscale_ip
+  port          = 5432
+  database_name = "appdb"
+  username      = "postgres"
+  password      = var.db_password
+  ssl_mode      = "none"
+}
+
+# 9. [역방향] DMS 복제 태스크 (Failback용 CDC)
+resource "aws_dms_replication_task" "reverse" {
+  migration_type           = "cdc" # 중요: 데이터 덮어쓰지 않고 변경분만 전송
+  replication_instance_arn = aws_dms_replication_instance.main.replication_instance_arn
+  replication_task_id      = "${var.project_name}-reverse-task"
+  source_endpoint_arn      = aws_dms_endpoint.reverse_source.endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.reverse_target.endpoint_arn
+
+  table_mappings = jsonencode({
+    rules = [
+      {
+        rule-type = "selection", rule-id = "1", rule-name = "include_api",
+        object-locator = { schema-name = "api", table-name = "%" },
+        rule-action = "include"
+      },
+      {
+        rule-type = "selection", rule-id = "2", rule-name = "include_app",
+        object-locator = { schema-name = "app", table-name = "%" },
+        rule-action = "include"
+      }
+    ]
+  })
+
+  replication_task_settings = jsonencode({
+    TargetMetadata = {
+      # 중요: 역방향은 이미 데이터가 있는 상태이므로 테이블을 절대 건드리지 않음
+      TargetTablePrepMode = "DO_NOTHING"
+      SupportLobs         = true
+    }
+    Logging = {
+      EnableLogging = true
+    }
+  })
+
+  tags = { Name = "${var.project_name}-reverse-task" }
+}
