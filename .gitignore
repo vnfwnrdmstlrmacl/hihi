@@ -4,3 +4,8 @@
 *.tfvars
 .terraform.lock.hcl
 db/group_vars/backup/terraform.yml
+terraform/*.backup
+terraform/*.tfstate
+*.backup
+*.tfstate
+terraform/*.tfstate*
