@@ -117,3 +117,11 @@ resource "aws_route" "private_to_onprem" {
   destination_cidr_block = "100.64.0.0/10" # Tailscale 대역
   network_interface_id   = module.tailscale_bridge.bridge_interface_id
 }
+
+module "dms_auto_failover" {
+  source = "./modules/dms_automation"
+
+  # 기존 DMS 리소스의 ARN을 결과값으로 넣어줌
+  forward_task_arn = aws_dms_replication_task.forward.replication_task_arn
+  reverse_task_arn = aws_dms_replication_task.reverse.replication_task_arn
+}
