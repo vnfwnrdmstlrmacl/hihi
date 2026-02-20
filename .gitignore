@@ -9,3 +9,6 @@ terraform/*.tfstate
 *.backup
 *.tfstate
 terraform/*.tfstate*
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup

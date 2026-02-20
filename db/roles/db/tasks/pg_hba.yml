@@ -42,3 +42,12 @@
     # 특정 IP가 아닌 서브넷 대역(예: 10.2.11.0/24)을 허용
     line: "host all all {{ dms_subnet_cidr }} scram-sha-256"
   notify: Reload patroni via REST
+- name: Allow Tailscale network explicitly in pg_hba.conf
+  ansible.builtin.lineinfile:
+    path: "{{ patroni_pg_data_dir }}/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: "0600"
+    insertafter: EOF
+    line: "host all all 100.64.0.0/10 scram-sha-256"
+  notify: Reload patroni via REST
