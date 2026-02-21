@@ -46,9 +46,9 @@ resource "aws_cloudwatch_event_rule" "dms_fail_rule" {
   event_pattern = jsonencode({
     "source": ["aws.dms"],
     "detail-type": ["DMS Replication Task State Change"],
-    "detail": {
-      "status": ["failed", "stopped"]
-    }
+  #  "detail": {
+  #    "status": ["failed", "stopped"]
+  #  }
   })
 }
 
