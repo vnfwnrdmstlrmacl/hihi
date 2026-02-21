@@ -55,7 +55,7 @@ resource "aws_cloudwatch_event_rule" "dms_fail_rule" {
 # [4] 규칙 2: 온프레미스 복구 체크 (5분 주기)
 resource "aws_cloudwatch_event_rule" "onprem_check_rule" {
   name                = "${var.project_name}-failback-check"
-  schedule_expression = "rate(5 minutes)"
+  schedule_expression = "rate(1 minute)"
 }
 
 # [5] 타겟 연결 (수정됨: 세미콜론 제거 및 줄바꿈 적용)
