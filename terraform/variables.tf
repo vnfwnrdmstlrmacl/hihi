@@ -75,3 +75,12 @@ variable "s3_retention_days" {
   type    = number
   default = 30
 }
+variable "db_allocated_storage"{
+  type = number
+  default = 100
+}
+
+variable "db_max_allocated_storage"{
+  type = number
+  default = 300
+}
