@@ -44,3 +44,13 @@ variable "bridge_sg_id" {
   description = "The security group ID of the Tailscale bridge"
   type        = string
 }
+
+variable "db_max_allocated_storage" {
+  description = "Maximum RDS storage for autoscaling"
+  type        = number
+}
+
+variable "backup_retention_period" {
+  description = "Backup retention days"
+  type        = number
+}
