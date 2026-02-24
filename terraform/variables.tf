@@ -51,10 +51,6 @@ variable "db_password" {
   sensitive = true
 }
 
-variable "db_allocated_storage" {
-  type    = number
-  default = 50
-}
 
 variable "bridge_ami_id" {
   type    = string
