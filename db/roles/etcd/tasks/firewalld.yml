@@ -84,3 +84,19 @@
   ansible.builtin.debug:
     var: fw_list_all.stdout
 
+- name: Allow etcd client port 2379 from cluster CIDR
+  ansible.posix.firewalld:
+    zone: "{{ fw_default_zone.stdout }}"
+    rich_rule: rule family="ipv4" source address="{{ etcd_cluster_cidr }}" port port="2379" protocol="tcp" accept
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Allow etcd peer port 2380 from cluster CIDR
+  ansible.posix.firewalld:
+    zone: "{{ fw_default_zone.stdout }}"
+    rich_rule: rule family="ipv4" source address="{{ etcd_cluster_cidr }}" port port="2380" protocol="tcp" accept
+    permanent: true
+    immediate: true
+    state: enabled
+
