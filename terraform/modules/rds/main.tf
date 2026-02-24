@@ -71,8 +71,7 @@ resource "aws_db_instance" "rds" {
   username             = "postgres"
   password             = var.db_password
   
-  # ✅ 스토리지: 최소/최대 분리해서 자동확장 켜기
-  allocated_storage     = var.db_allocated_storage   # 예: 100 (최소 시작)
+  # ✅ 스토리지: 최소/최대 분리해서 자동확장 켜기   # 예: 100 (최소 시작)
   max_allocated_storage = var.db_max_allocated_storage # 예: 300 (자동 확장 상한)
   storage_type = "gp3"
 
