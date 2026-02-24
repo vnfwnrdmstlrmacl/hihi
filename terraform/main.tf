@@ -68,6 +68,7 @@ module "rds" {
   db_allocated_storage = var.db_allocated_storage
   dms_sg_id            = module.dms.dms_sg_id
   bridge_sg_id         = module.tailscale_bridge.bridge_sg_id
+  db_max_allocated_storage = var.db_max_allocated_storage
 }
 
 #################################################
