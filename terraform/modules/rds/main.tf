@@ -1,4 +1,3 @@
-# 1. DB 서브넷 그룹 (RDS를 특정 서브넷에 묶음)
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-db-subnet-group"
   subnet_ids = var.db_subnet_ids
@@ -59,6 +58,7 @@ resource "aws_db_parameter_group" "pg13" {
   }
 }
 
+
 # 4. RDS PostgreSQL 인스턴스
 resource "aws_db_instance" "rds" {
   identifier           = "${var.project_name}-rds"
@@ -71,12 +71,26 @@ resource "aws_db_instance" "rds" {
   username             = "postgres"
   password             = var.db_password
   
+  # ✅ 스토리지: 최소/최대 분리해서 자동확장 켜기
+  allocated_storage     = var.db_allocated_storage   # 예: 100 (최소 시작)
+  max_allocated_storage = var.db_max_allocated_storage # 예: 300 (자동 확장 상한)
+  storage_type = "gp3"
+
+  # 운영 안정성 (다운타임 최소화/작업 시간 확보)
+  backup_retention_period = 1
+  deletion_protection     = false
+  skip_final_snapshot     = true
+  publicly_accessible     = false
+
   parameter_group_name = aws_db_parameter_group.pg13.name
+
   db_subnet_group_name = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   
-  skip_final_snapshot  = true # 연습/테스트용 (실운영시 false 권장)
+  skip_final_snapshot  = false # 연습/테스트용 (실운영시 false 권장)
   publicly_accessible  = false # 외부 노출 차단
+  apply_immediately = true
 
   tags = { Name = "${var.project_name}-rds" }
+
 }

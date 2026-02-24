@@ -68,7 +68,7 @@ variable "bridge_instance_type" {
 
 variable "dms_instance_class" {
   type    = string
-  default = "dms.t3.medium"
+  default = "dms.t3.large"
 }
 
 variable "s3_retention_days" {
