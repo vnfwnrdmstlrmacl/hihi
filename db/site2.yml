@@ -1,17 +1,14 @@
 - name: "[Ansible 1] On-premise Network & AWS DMS Preparation (HA Optimized)"
   hosts: proxy
-  # hosts를 proxy로 설정했으므로, 앤시블은 인벤토리에 있는 모든 프록시를 훑습니다.
   become: yes
   vars_files:
     - group_vars/all/vault.yml
   vars:
-    # 알려주신 실제 DB VIP 대역(10.2.3.x)으로 수정했습니다.
     onprem_vip_subnet: "10.2.3.0/24"
 
   tasks:
     ##########################################################
     # 0. 환경 정비 (Proxy 그룹 전체)
-    # 어떤 Proxy가 컨트롤 타워가 될지 모르니 모두에게 무기를 쥐여줍니다.
     ##########################################################
     - name: 모든 Proxy 서버에 AWS SDK(boto3) 설치
       ansible.builtin.pip:
@@ -19,14 +16,13 @@
           - boto3
           - botocore
         executable: pip3
-      # delegate_to를 삭제하여 모든 proxy 노드에 설치되게 합니다.
+      # delegate_to를 삭제하여 모든 proxy 노드에 설치.
 
     ##########################################################
     # 1. AWS DMS 사전 준비 (IAM Role 생성)
-    # '현재 이 플레이북을 실행 중인 노드'가 AWS API를 호출하도록 합니다.
     ##########################################################
     - name: DMS용 VPC Role 생성 (dms-vpc-role)
-      # 특정 노드를 지칭하지 않고 run_once를 써서 한 번만 실행되게 합니다.
+      # 특정 노드를 지칭하지 않고 run_once를 써서 한 번만 실행.
       run_once: true
       delegate_to: localhost
       become: no
@@ -112,13 +108,12 @@
     # 4. Terraform 변수 파일 생성 (onprem.auto.tfvars)
     ##########################################################
     - name: Terraform 변수 파일 생성 (onprem.auto.tfvars)
-      # 파일 생성은 실행 중인 노드의 로컬 경로에만 하면 됩니다.
       run_once: true
       delegate_to: localhost
       become: no
       copy:
         content: |
-          # Ansible에 의해 자동 생성된 변수 파일 (수정 금지)
+          # Ansible에 의해 자동 생성된 변수 파일
           onprem_db_tailscale_ip = "{{ proxy_ts_ip.stdout | trim }}"
           tailscale_auth_key     = "{{ dynamic_ts_key }}"
         dest: "{{ playbook_dir | dirname }}/terraform/onprem.auto.tfvars"
