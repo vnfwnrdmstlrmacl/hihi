@@ -129,8 +129,8 @@
     - (backup_rotate_replication_password | default(false)) | bool
     - patroni_config_updated.changed | default(false)
 
-# ✅ 핵심: 비번을 바꿨으면 pgpass도 전 노드 동기화해야 Replica가 안 죽음
-# 접속 대상 호스트는 "리더의 ansible_host"로 통일 (VIP 쓰는 구조면 여기만 VIP로 교체)
+# 비번을 바꿨으면 pgpass도 전 노드 동기화해야 Replica가 안 죽음
+# 접속 대상 호스트는 리더의 ansible_host로 통일 (VIP 쓰는 구조면 여기만 VIP로 교체)
 - name: Sync /var/lib/pgsql/pgpass on all nodes (only when password rotated)
   become: yes
   become_user: root
